@@ -1,0 +1,23 @@
+### Add first buddy
+POST http://localhost:8080/addressbooks/1/buddies
+Content-Type: application/json
+
+{
+  "name": "Anas",
+  "phoneNumber": "613-2222"
+}
+
+### Add second buddy
+POST http://localhost:8080/addressbooks/1/buddies
+Content-Type: application/json
+
+{
+  "name": "Alex",
+  "phoneNumber": "613-1111"
+}
+
+### Fetch JSON to confirm
+GET http://localhost:8080/addressbooks/1
+
+### View in browser
+GET http://localhost:8080/view/1
