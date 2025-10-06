@@ -2,22 +2,19 @@ package ca.sysc4806;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class AddressBookViewController {
+    private final AddressBookRepository bookRepo;
 
-    private final AddressBookRepository repo;
-
-    public AddressBookViewController(AddressBookRepository repo) {
-        this.repo = repo;
+    public AddressBookViewController(AddressBookRepository bookRepo) {
+        this.bookRepo = bookRepo;
     }
 
     @GetMapping("/view/{id}")
-    public String viewBook(@PathVariable Long id, Model model) {
-        AddressBook book = repo.findById(id).orElseThrow();
-        model.addAttribute("addressBook", book);
-        return "addressbook"; // matches addressbook.html in templates
+    public String view(@PathVariable Long id, Model model) {
+        model.addAttribute("addressBook", bookRepo.findById(id).orElse(null));
+        return "addressbook"; // renders src/main/resources/templates/addressbook.html
     }
 }

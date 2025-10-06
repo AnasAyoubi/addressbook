@@ -1,23 +1,20 @@
-### Add first buddy
-POST http://localhost:8080/addressbooks/1/buddies
+### Create a book
+POST https://<YOUR-APP>.azurewebsites.net/addressbooks
 Content-Type: application/json
 
-{
-  "name": "Anas",
-  "phoneNumber": "613-2222"
-}
+{"label": "My Contacts"}
 
-### Add second buddy
-POST http://localhost:8080/addressbooks/1/buddies
+### Add buddy 1
+POST https://<YOUR-APP>.azurewebsites.net/addressbooks/1/buddies
 Content-Type: application/json
 
-{
-  "name": "Alex",
-  "phoneNumber": "613-1111"
-}
+{"name": "Anas", "phoneNumber": "613-2222"}
 
-### Fetch JSON to confirm
-GET http://localhost:8080/addressbooks/1
+### Add buddy 2
+POST https://<YOUR-APP>.azurewebsites.net/addressbooks/1/buddies
+Content-Type: application/json
 
-### View in browser
-GET http://localhost:8080/view/1
+{"name": "Ayoubi", "phoneNumber": "613-1111"}
+
+### (Optional) check JSON
+GET https://<YOUR-APP>.azurewebsites.net/addressbooks/1
