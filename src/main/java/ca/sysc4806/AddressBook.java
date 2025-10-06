@@ -15,7 +15,7 @@ public class AddressBook {
     private String label; // e.g., "My Contacts"
 
     // Unidirectional OneToMany to BuddyInfo.
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "address_book_id")
     private List<BuddyInfo> buddies = new ArrayList<>();
 
