@@ -18,6 +18,11 @@ public class AddressBookController {
         this.buddyRepo = buddyRepo;
     }
 
+    @GetMapping("/")
+    public String home(){
+        return "App is running on Azure";
+    }
+
     // GET /addressbooks → returns all address books
     @GetMapping
     public Iterable<AddressBook> getAllAddressBooks() {
