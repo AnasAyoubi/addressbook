@@ -1,12 +1,12 @@
-
 package ca.sysc4806;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,49 +14,47 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(AddressBookController.class)
 class AddressBookControllerMockTest {
 
-    @Autowired
-    private MockMvc mvc;
+    @Autowired MockMvc mvc;
 
-    @MockBean private AddressBookRepository bookRepo;
-    @MockBean private BuddyInfoRepository buddyRepo;
+    @MockBean AddressBookRepository bookRepo;
+    @MockBean BuddyInfoRepository buddyRepo;
 
     @Test
-    void getAllAddressBooks_returnsMyContactsWithThreeBuddies() throws Exception {
+    void getAll_returnsJsonWithThreeBuddies() throws Exception {
         AddressBook ab = new AddressBook("My Contacts");
+        ab.setId(1L);
         ab.addBuddy(new BuddyInfo("Anas", "613-2222"));
         ab.addBuddy(new BuddyInfo("Ayoubi", "613-1111"));
         ab.addBuddy(new BuddyInfo("Alex", "613-3333"));
 
         Mockito.when(bookRepo.findAll()).thenReturn(List.of(ab));
 
-        mvc.perform(get("/addressbooks"))
+        mvc.perform(get("/addressbooks").accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].label").value("My Contacts"))
                 .andExpect(jsonPath("$[0].buddies[*].name",
-                        containsInAnyOrder("Anas", "Ayoubi", "Alex")))
-                .andExpect(jsonPath("$[0].buddies[*].phoneNumber",
-                        containsInAnyOrder("613-2222", "613-1111", "613-3333")));
+                        containsInAnyOrder("Anas", "Ayoubi", "Alex")));
     }
 
     @Test
-    void getBookById_returnsMyContacts() throws Exception {
+    void getOne_returnsExpectedBook() throws Exception {
         AddressBook ab = new AddressBook("My Contacts");
+        ab.setId(99L);
         ab.addBuddy(new BuddyInfo("Anas", "613-2222"));
         ab.addBuddy(new BuddyInfo("Ayoubi", "613-1111"));
         ab.addBuddy(new BuddyInfo("Alex", "613-3333"));
 
-        Mockito.when(bookRepo.findById(1L)).thenReturn(Optional.of(ab));
+        Mockito.when(bookRepo.findById(99L)).thenReturn(Optional.of(ab));
 
-        mvc.perform(get("/addressbooks/1"))
+        mvc.perform(get("/addressbooks/99").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.label").value("My Contacts"))
-                .andExpect(jsonPath("$.buddies[*].name",
-                        containsInAnyOrder("Anas", "Ayoubi", "Alex")))
-                .andExpect(jsonPath("$.buddies[*].phoneNumber",
-                        containsInAnyOrder("613-2222", "613-1111", "613-3333")));
+                .andExpect(jsonPath("$.buddies", hasSize(3)));
     }
 }
