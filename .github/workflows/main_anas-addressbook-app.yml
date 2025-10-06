@@ -5,9 +5,14 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write  # harmless; useful if you later open PRs
+
 jobs:
   build:
-    runs-on: windows-latest  # keep whatever you already use
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,45 +23,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # ⬅️ Run the tests (this fails the job if any test fails)
       - name: Run tests
         run: mvn -B -ntp -DskipTests=false test
 
-      # ⬅️ Publish a neat "Tests" tab in Actions UI
       - name: Publish JUnit report
         uses: dorny/test-reporter@v1
-        if: always()                      # show results even if tests fail
+        if: always()
         with:
           name: JUnit Results
           path: target/surefire-reports/*.xml
           reporter: java-junit
-
-      # (optional but nice) keep the raw reports as a downloadable artifact
-      - name: Upload surefire reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: surefire-reports
-          path: target/surefire-reports/
-
-      # your existing package step
-      - name: Build with Maven
-        run: mvn -B -ntp -DskipTests package
-
-      # your existing step that prepares the ZIP/JAR artifact for deploy...
-      # (leave whatever you already have)
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: java-app
-          path: target/*.jar
-
-  deploy:
-    needs: build
-    runs-on: windows-latest
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: java-app
-      # ...your existing Azure Web App deploy step(s)...
+          token: ${{ secrets.GITHUB_TOKEN }}   # explicit token (optional)
