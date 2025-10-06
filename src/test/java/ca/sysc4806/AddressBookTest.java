@@ -1,46 +1,25 @@
 package ca.sysc4806;
 
-import jakarta.persistence.*;
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 public class AddressBookTest {
 
-    private static EntityManagerFactory emf;
-    private EntityManager em;
-
-    @BeforeAll
-    static void init() {
-        emf = Persistence.createEntityManagerFactory("addressbookPU");
-    }
-
-    @BeforeEach
-    void setup() {
-        em = emf.createEntityManager();
-    }
-
-    @AfterEach
-    void tearDown() {
-        if (em.isOpen()) em.close();
-    }
-
-    @AfterAll
-    static void shutdown() {
-        emf.close();
-    }
+    @Autowired
+    private AddressBookRepository bookRepo;
 
     @Test
-    void testPersistAddressBookWithBuddies() {
-        AddressBook book = new AddressBook("My Contacts");
-        book.addBuddy(new BuddyInfo("Anas", "613-1111"));
-        book.addBuddy(new BuddyInfo("Ayoubi", "613-2222"));
+    void testAddBuddy() {
+        AddressBook book = new AddressBook("Friends");
+        BuddyInfo buddy = new BuddyInfo("John", "613-5555");
+        book.addBuddy(buddy);
+        bookRepo.save(book);
 
-        em.getTransaction().begin();
-        em.persist(book);
-        em.getTransaction().commit();
-
-        AddressBook found = em.find(AddressBook.class, book.getId());
-        assertNotNull(found);
-        assertEquals(2, found.getBuddies().size());
+        AddressBook found = bookRepo.findById(book.getId()).orElse(null);
+        assertThat(found).isNotNull();
+        assertThat(found.getBuddies().size()).isEqualTo(1);
     }
 }
