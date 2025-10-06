@@ -1,63 +1,36 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy JAR app to Azure Web App - anas-addressbook-app
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write  # harmless; useful if you later open PRs
 
 jobs:
   build:
     runs-on: windows-latest
-    permissions:
-      contents: read #This is required for actions/checkout
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Java version
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'microsoft'
 
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Run tests
+        run: mvn -B -ntp -DskipTests=false test
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+      - name: Publish JUnit report
+        uses: dorny/test-reporter@v1
+        if: always()
         with:
-          name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: java-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FF16DA6E3BDD4DEF90D229CC123349E8 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D35897FFC2274C7382665B275B6C46D1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B7963001D05E4894BF3282A2788C4E19 }}
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'anas-addressbook-app'
-          slot-name: 'Production'
-          package: '*.jar'
-          
+          name: JUnit Results
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+          token: ${{ secrets.GITHUB_TOKEN }}   # explicit token (optional)
