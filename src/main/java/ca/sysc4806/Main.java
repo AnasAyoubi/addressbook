@@ -10,9 +10,13 @@ public class Main {
         EntityManager em = emf.createEntityManager();
 
         em.getTransaction().begin();
-        AddressBook book = new AddressBook("My Contacts");
-        book.addBuddy(new BuddyInfo("Anas", "613-1111"));
-        book.addBuddy(new BuddyInfo("Ayoubi",   "613-2222"));
+
+        AddressBook book = new AddressBook();
+        book.setLabel("My Contacts");
+
+        book.addBuddy(new BuddyInfo("Anas",   "613-1111"));
+        book.addBuddy(new BuddyInfo("Ayoubi", "613-2222"));
+
         em.persist(book);
         em.getTransaction().commit();
 

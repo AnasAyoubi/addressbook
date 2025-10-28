@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="'Address Book ' + ${book.label}">Book</title>
+</head>
+<body>
+<h1 th:text="'Address Book: ' + ${book.label}"></h1>
+
+<h2>Buddies</h2>
+<table border="1">
+  <tr>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Actions</th>
+  </tr>
+  <tr th:each="bud : ${book.buddies}">
+    <td th:text="${bud.name}">Name</td>
+    <td th:text="${bud.phoneNumber}">Phone</td>
+    <td>
+      <form th:action="@{'/ui/buddies/' + ${bud.id} + '/delete'}" method="post">
+        <input type="hidden" name="bookId" th:value="${book.id}" />
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<h3>Add Buddy</h3>
+<form th:action="@{'/ui/books/' + ${book.id} + '/buddies'}"
+      th:object="${newBuddy}"
+      method="post">
+  <input type="text" th:field="*{name}" placeholder="Name" required />
+  <input type="text" th:field="*{phoneNumber}" placeholder="Phone" required />
+  <button type="submit">Add Buddy</button>
+</form>
+
+<p><a href="/ui/books">Back to all books</a></p>
+</body>
+</html>

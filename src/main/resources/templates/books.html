@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Address Books</title>
+</head>
+<body>
+<h1>Address Books</h1>
+
+<table border="1">
+    <tr><th>ID</th><th>Label</th></tr>
+    <tr th:each="b : ${books}">
+        <td th:text="${b.id}"></td>
+        <td>
+            <a th:href="@{'/ui/books/' + ${b.id}}" th:text="${b.label}"></a>
+        </td>
+    </tr>
+</table>
+
+<h3>Add a new book</h3>
+<form th:action="@{/ui/books}" method="post" th:object="${newBook}">
+    <input type="text" th:field="*{label}" placeholder="Book label" required/>
+    <button type="submit">Add</button>
+</form>
+
+</body>
+</html>
